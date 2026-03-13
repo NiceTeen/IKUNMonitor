@@ -37,34 +37,38 @@ class Scraper:
             self.cookies = None
 
     def request_user_quote(self):
-        try:
-            url = "https://api.ikuncode.cc/api/user/self"
-            headers = {
-                "cookie": self.cookies,
-                "new-api-user": self.user_id,
-                "referer": "https://api.ikuncode.cc/console",
-            }
-            response = requests.get(url, headers=headers)
-            data = response.json()["data"]
-            return data
-        except Exception as e:
-            return None
+        for i in range(3):
+            try:
+                url = "https://api.ikuncode.cc/api/user/self"
+                headers = {
+                    "cookie": self.cookies,
+                    "new-api-user": self.user_id,
+                    "referer": "https://api.ikuncode.cc/console",
+                }
+                response = requests.get(url, headers=headers)
+                data = response.json()["data"]
+                return data
+            except Exception as e:
+                continue
+        return None
 
     def request_user_state(self):
-        try:
-            end_date = datetime.now()
-            start_date = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=0, minute=0, second=0)
-            url = f"https://api.ikuncode.cc/api/log/self/stat?type=0&token_name=&model_name=&start_timestamp={int(start_date.timestamp())}&end_timestamp={int(end_date.timestamp())}&group="
-            headers = {
-                "cookie": self.cookies,
-                "new-api-user": self.user_id,
-                "referer": "https://api.ikuncode.cc/console",
-            }
-            response = requests.get(url, headers=headers)
-            data = response.json()["data"]
-            return data
-        except Exception as e:
-            return None
+        for i in range(3):
+            try:
+                end_date = datetime.now()
+                start_date = datetime(year=end_date.year, month=end_date.month, day=end_date.day, hour=0, minute=0, second=0)
+                url = f"https://api.ikuncode.cc/api/log/self/stat?type=0&token_name=&model_name=&start_timestamp={int(start_date.timestamp())}&end_timestamp={int(end_date.timestamp())}&group="
+                headers = {
+                    "cookie": self.cookies,
+                    "new-api-user": self.user_id,
+                    "referer": "https://api.ikuncode.cc/console",
+                }
+                response = requests.get(url, headers=headers)
+                data = response.json()["data"]
+                return data
+            except Exception as e:
+                continue
+        return None
 
     def quota_to_balance(self, quato):
         return str(round(quato * 0.000002, 2))
@@ -264,7 +268,7 @@ class TrayAppController:
             except Exception as e:
                 used_balance = "异常"
             self.set_metrics(balance, used_balance)
-            time.sleep(60)
+            time.sleep(20)
 
     def _bind_signals(self):
         self.signals.balance_changed.connect(self.monitor_widget.set_balance)
